@@ -26,7 +26,7 @@ async def hello_button(update, context):
     else:
         await send_text(update,context,"Процесс остановлен")
 
-app = ApplicationBuilder().token("8175570126:AAGAKSJai7PzR-rnmxmjw4jJF2i8t4TRZgo").build()
+app = ApplicationBuilder().token("your-tokern").build()
 app.add_handler(CommandHandler("start", start))
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND , hello))
 app.add_handler(CallbackQueryHandler(hello_button))
