@@ -33,10 +33,67 @@ async def gpt_dialog(update, context):
     answer = await chatgpt.send_question(promt, text)
     await send_text(update, context, answer)
 
+async def date(update, context):
+    dialog.mode = "date"
+    text = load_message("date")
+    await send_text(update, context, "date")
+    await send_text_buttons(update, context, text,{
+        "date_grande": "Ариана Гранде",
+        "date_margo": "Марго Робби",
+        "date_zendeya": "Зендея",
+        "date_rayan": "Райан Гослинг",
+        "date_tom": "Том Харди"
+    })
+
+
+async def date_dialog(update, context):
+    text = update.message.text
+    my_message = await send_text(update, context, "Девушка набирает текст...")
+    answer = await chatgpt.add_message(text)
+    await  my_message.edit_text(answer)
+
+async def date_button(update, context):
+    query = update.callback_query.data
+    await update.callback_query.answer()
+
+
+    await send_photo(update, context, query)
+    await send_text(update, context, "Отличный выбор! Пригласите девушку (парня) на свидание за 5 сообщений")
+
+    prompt = load_prompt(query)
+    chatgpt.set_prompt(prompt)
+
+async def message(update, context):
+    dialog.mode = "message"
+    text = load_message("message")
+    await send_photo(update, context, "message")
+    await send_text_buttons(update, context, text,{
+        "message_text": "Следующее сообщение",
+        "message_date": "Пригласить на свидание"
+    })
+    dialog.list.clear()
+
+async def message_button(update, context):
+    query = update.callback_query.data
+    await update.callback_query.answer()
+
+    prompt=load_prompt(query)
+    user_chat_history = "\n\n".join(dialog.list)
+    my_message =  await send_text(update, context, "Чат GPT думает над вариантами ответа...")
+    answer = await chatgpt.send_question(prompt, user_chat_history)
+    await my_message.edit_text(answer)
+ 
+async def message_dialog(update, context):
+    text = update.message.text
+    dialog.list.append(text)
 
 async def hello(update, context):
     if dialog.mode == "gpt":
         await gpt_dialog(update, context)
+    if dialog.mode == "date":
+        await date_dialog(update, context)
+    if dialog.mode == "message":
+        await message_dialog(update, context)
     else:
         await send_text(update, context, "*Привет*")
         await send_text(update, context, "_Как дела?_")
@@ -58,6 +115,7 @@ async def hello_button(update, context):
 
 dialog = Dialog()
 dialog.mode = None
+dialog.list = []
 
 chatgpt = ChatGptService(
     token="javcgk8pFZZssAv/GAaLFtpU2XRxcYwvevXZIyGFAmFZI3L06qepS/RV1vwI5WWJCzXUXxhEgBL78gsqw097AFLgJhfSJIYTGLJXuNmmC1WHnD5rLqK5bovPAMquTedVct0tMO3YKL7WnwWVBYot49YP/DsQPPKt8po+UHHV7OmqYXjjYWW2CcTundXGhGuyvJm5sNKlWWp5DZqBhLIWahLjBMGuOH0m3XMutHaIG8dtbZZqI=")
@@ -65,6 +123,12 @@ chatgpt = ChatGptService(
 app = ApplicationBuilder().token("your-tokern").build()
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("gpt", gpt))
+app.add_handler(CommandHandler("date", date))
+app.add_handler(CommandHandler("message", message))
+
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, hello))
+
 app.add_handler(CallbackQueryHandler(hello_button))
+app.add_handler(CallbackQueryHandler(message_button,pattern="^message_.*"))
+app.add_handler(CallbackQueryHandler(date_button,pattern="^date_.*"))
 app.run_polling()
