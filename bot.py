@@ -198,7 +198,7 @@ dialog.user = {}
 chatgpt = ChatGptService(
     token="javcgk8pFZZssAv/GAaLFtpU2XRxcYwvevXZIyGFAmFZI3L06qepS/RV1vwI5WWJCzXUXxhEgBL78gsqw097AFLgJhfSJIYTGLJXuNmmC1WHnD5rLqK5bovPAMquTedVct0tMO3YKL7WnwWVBYot49YP/DsQPPKt8po+UHHV7OmqYXjjYWW2CcTundXGhGuyvJm5sNKlWWp5DZqBhLIWahLjBMGuOH0m3XMutHaIG8dtbZZqI=")
 
-app = ApplicationBuilder().token("8175570126:AAGAKSJai7PzR-rnmxmjw4jJF2i8t4TRZgo").build()
+app = ApplicationBuilder().token("youtoken").build()
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("gpt", gpt))
 app.add_handler(CommandHandler("date", date))
